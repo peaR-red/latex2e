@@ -1,3 +1,8 @@
+2026-01-26  Ulrike Fischer  <Ulrike.Fischer@latex-project.org>
+
+	* latex2e-first-aid-for-external-files.dtx: remove firstaid for cellspace again, it has been fixed.
+
+
 2026-01-18  Frank Mittelbach  <Frank.Mittelbach@latex-project.org>
 
 	* latex2e-first-aid-for-external-files.dtx (subsection{The \pkg{cellspace} package first aid}):
