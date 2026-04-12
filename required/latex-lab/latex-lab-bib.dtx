@@ -1,6 +1,6 @@
 % \iffalse meta-comment
 %
-%% File: latex-lab-bib.dtx (C) Copyright 2023 LaTeX Project
+%% File: latex-lab-bib.dtx (C) Copyright 2023-2026 LaTeX Project
 %
 % It may be distributed and/or modified under the conditions of the
 % LaTeX Project Public License (LPPL), either version 1.3c of this
@@ -15,12 +15,11 @@
 %
 %    https://github.com/latex3/latex2e/issues
 %
-\def\ltlabbibdate{2026-01-16}
-\def\ltlabbibversion{0.81d}
+\def\ltlabbibdate{2026-04-10}
+\def\ltlabbibversion{0.81f}
 %<*driver>
 \DocumentMetadata{tagging=on,pdfstandard=ua-2}
 \documentclass{l3in2edoc}
-\usepackage{latex-lab-testphase-l3doc}
 \EnableCrossrefs
 \CodelineIndex
 \begin{document}
@@ -38,12 +37,7 @@
 %
 % \maketitle
 %
-% \newcommand{\xt}[1]{\textsl{\textsf{#1}}}
-% \newcommand{\TODO}[1]{\textbf{[TODO:} #1\textbf{]}}
-% \newcommand{\docclass}{document class \marginpar{\raggedright document class
-% customizations}}
-%
-% \providecommand\hook[1]{\texttt{#1}}
+% \providecommand{\TODO}[1]{\textbf{[TODO:} #1\textbf{]}}
 %
 % \begin{abstract}
 % \end{abstract}
@@ -146,17 +140,8 @@
 \ProvidesExplPackage {latex-lab-testphase-bib} {\ltlabbibdate} {\ltlabbibversion}
   {Code related to the tagging of bibliography and cite command}
 %    \end{macrocode}
-% We need at least the block tagging code.
-%    \begin{macrocode}
-\RequirePackage{latex-lab-testphase-block}  
-%    \end{macrocode}
 %
-% At first we suppress the patches from hyperref. This will only work with the next
-% hyperref!
-%    \begin{macrocode}
-\def\hyper@nopatch@bib{}
-%    \end{macrocode}
-
+%
 % \begin{macro}{\@extra@binfo,\@extra@b@citeb}
 % These are taken from hyperref, they are for chapterbib compatibility (and also
 % signal to chapterbib not to change the citation commands)
@@ -239,14 +224,13 @@
 % now, but perhaps this need a recipe? 
 % 
 %    \begin{macrocode}
-\def\LItag{LI} % temporarily until \UseStructureName is used
 \AddToHook{env/thebibliography/begin}
   {
     \cs_set:Npn \__block_list_item_begin:
      { 
        \tag_struct_begin:n
          {
-          tag=\LItag,
+          tag=\UseStructureName{block/list/item},
           label= cite.\l_@@_bib_citekey_tl\@extra@b@citeb
          }
      }
@@ -271,13 +255,11 @@
 \let\@kernel@copy@bibcite\bibcite         
 %    \end{macrocode}
 % Now we add the tagging structure.
-% TODO: with the next tagpdf version it should no longer be 
-% needed to expand the ref key.
 %    \begin{macrocode}
 \AddToHookWithArguments{bibcite/before}
   {
     \tag_mc_end_push:
-    \exp_args:Ne\tagstructbegin{tag=Reference,ref=cite.#1\@extra@b@citeb}
+    \tagstructbegin{tag=\UseStructureName{cite},ref=cite.#1\@extra@b@citeb}
     \tagmcbegin{}
   }
 \AddToHookWithArguments{bibcite/after}[tag]
@@ -326,12 +308,13 @@
 %    \end{macrocode}
 % This can be shared by both packages: it will work with natbib with and without hyperref.
 % With biblatex it will work without hyperref as long as \cs{@extra@b@citeb} is empty
+% \changes{0.81f}{2026-04-10}{Remove \cs{@extra@b@citeb}, tagging issue \#1282}
 %    \begin{macrocode}
 \AddToHookWithArguments{cmd/hyper@natlinkstart/before}
  {
    \leavevmode
    \tag_mc_end_push:
-   \exp_args:Ne\tag_struct_begin:n{tag=Reference,ref=cite.#1\@extra@b@citeb}
+   \tag_struct_begin:n{tag=\UseStructureName{cite},ref=cite.#1}
    \tag_mc_begin:n{}
  }
 \AddToHook{cmd/hyper@natlinkend/after}
@@ -344,7 +327,7 @@
 %    \end{macrocode}
 % if hyperref is loaded we have to revert its definition of the natbib hooks
 % and add its code through the generic hooks. 
-% TODO: allow to suppress the natbib code in hyperref. 
+% TODO: remove once hyperref supports that directly.
 % 
 %    \begin{macrocode}
 \AddToHook{package/hyperref/after}
@@ -379,34 +362,20 @@
         {
           \tag_struct_begin:n
            {
-            tag=\LItag,
+            tag=\UseStructureName{block/list/item},
            }
         }   
         {
           \tag_struct_begin:n
            {
-            tag=\LItag,
+            tag=\UseStructureName{block/list/item},
             label= cite.\the\c@refsection @\abx@field@entrykey
            }
         }   
      }
   }
 %    \end{macrocode}
-% biblatex without hyperref is currently not supported but we at least avoid that it
-% errors:
-%    \begin{macrocode}
-\AddToHook{package/biblatex/after}
- {
-  \appto\blx@mknohyperref
-   {
-    \let\blx@anchors\@empty
-    \protected\def\blx@anchor{%
-       \xifinlist{\the\c@refsection @\abx@field@entrykey}{\blx@anchors}
-         {}
-         {\listxadd\blx@anchors{\the\c@refsection @\abx@field@entrykey}}}%
-   }
- }  
-%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}

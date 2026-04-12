@@ -15,8 +15,8 @@
 %
 %    https://github.com/latex3/latex2e/issues
 %
-\def\ltlabfirstaiddate{2026-02-12}
-\def\ltlabfirstaidversion{0.85t}
+\def\ltlabfirstaiddate{2026-04-08}
+\def\ltlabfirstaidversion{0.85v}
 
 %<*driver>
 \DocumentMetadata{tagging=on,pdfstandard=ua-2}
@@ -60,6 +60,8 @@
 %   No longer needed with new \cs{@doendpe} code.}
 % \changes{v0.85g}{2024/10/04}{Added firstaid for fancyvrb.}
 % \changes{v0.85n}{2025-10-12}{Added firstaid for pgf.}
+% \changes{v0.85u}{2026-04-08}{Added firstaid for H-floats.}
+% \changes{v0.85u}{2026-04-08}{Removed microtype firstaid. No longer needed.}
 % \changes{v0.85t}{2026-03-12}{Switch from \texttt{x}- to \texttt{e}-type
 %   expansion in expl3 code}
 % \section{Implementation}
@@ -70,7 +72,7 @@
 %    \end{macrocode}
 %    \begin{macrocode}
 \ProvidesPackage {latex-lab-testphase-firstaid} [%
-   \ltlabfirstaiddate\space v\ltlabfirstaiddate\space
+   \ltlabfirstaiddate\space v\ltlabfirstaidversion\space
    Temporary patches to external packages needed for the tagging project]
 %    \end{macrocode}
 %  \begin{macro}[no-user-doc]{\FirstAidNeededT}
@@ -200,7 +202,7 @@
     {indent  =  \z@,  number-title-sep  =  0.5em}
  }  
 %    \end{macrocode}
-
+%
 % The redefinitions for amsbook:
 %    \begin{macrocode}
 \AddToHook{class/amsbook/after}[latex-lab-testphase-firstaid/amschap]
@@ -215,14 +217,8 @@
 %    \end{macrocode}
 %
 % \subsection{ams classes and amsthm}
-% The amsart, amsbook and amsproc classes redefine the theorem code
-% and this breaks the tagging added by the block code. The following
-% reenables tagging. It does \emph{not} give a completly identical output
-% (similar to the new theorem code, 
-%  see \url{https://github.com/latex3/tagging-project/issues/715}). 
-%  The code also does not try to use sockets yet, as the theorem definitions
-%  in the block code don't do that yet either.  
-% \changes{0.85l}{2025-07-02}{Removed \cs{tag_if_active} test, this errors with tagging=off}
+%  In this classes the abstract is stored in a \cs{vbox}, as it ends with a list
+%  an explicit \cs{par} is needed.
 %    \begin{macrocode}
 \AddToHook{class/amsart/after}[latex-lab-testphase-firstaid/abstract]
           {
@@ -238,26 +234,26 @@
 %    \begin{macrocode}
 \cs_new_protected:Npn \@@_firstaid_ams_abstract:
   {
-\renewenvironment{abstract}{%
-  \ifx\maketitle\relax
-    \ClassWarning{\@classname}{Abstract~ should~ precede~
-      \protect\maketitle\space in~ AMS~ document~ classes;~ reported}%
-  \fi
-  \global\setbox\abstractbox=\vtop \bgroup
-    \normalfont\Small
-    \list{}{\labelwidth\z@
-      \leftmargin3pc \rightmargin\leftmargin
-      \listparindent\normalparindent \itemindent\z@
-      \parsep\z@ \@plus\p@
-      \let\fullwidthdisplay\relax
-    }%
-    \item[\hskip\labelsep\scshape\abstractname.]%
-}{%
-  \endlist
-  \par              % <--- added
-  \egroup
-  \ifx\@setabstract\relax \@setabstracta \fi
-}
+    \renewenvironment{abstract}{%
+      \ifx\maketitle\relax
+        \ClassWarning{\@classname}{Abstract~ should~ precede~
+          \protect\maketitle\space in~ AMS~ document~ classes;~ reported}%
+      \fi
+      \global\setbox\abstractbox=\vtop \bgroup
+        \normalfont\Small
+        \list{}{\labelwidth\z@
+          \leftmargin3pc \rightmargin\leftmargin
+          \listparindent\normalparindent \itemindent\z@
+          \parsep\z@ \@plus\p@
+          \let\fullwidthdisplay\relax
+        }%
+        \item[\hskip\labelsep\scshape\abstractname.]%
+    }{%
+      \endlist
+      \par              % <--- added
+      \egroup
+      \ifx\@setabstract\relax \@setabstracta \fi
+    }
   }
 \ExplSyntaxOff
 %    \end{macrocode}
@@ -305,7 +301,7 @@
 %    value and not any more a key value list for altering the
 %    environment settings.
 %    
-%    A more elabroate version could be something like this that allows
+%    A more elaborate version could be something like this that allows
 %    key/val and legacy interface. Or one could extend the list
 %    template to support a \texttt{list-width} key.
 %\begin{verbatim}
@@ -394,7 +390,7 @@
 % (but longtable more as booktabs handles lines in longtable differently).
 % See also issue \url{https://github.com/latex3/tagging-project/issues/69}
 % 
-% 
+% \changes{0.85v}{2026-04-08}{Use tagging sockets}
 %    \begin{macrocode}
 \ExplSyntaxOn
 \AddToHook{package/booktabs/after} 
@@ -404,25 +400,27 @@
    &\multispan\@cmidlb
    \unskip\hskip\cmrkern@l
   {
-   \tag_mc_begin:n{artifact}
+   \UseTaggingSocket{tbl/leaders/begin}
    \CT@arc@\leaders\hrule \@height\@thisrulewidth\hfill\kern\z@}
    \hskip\cmrkern@r
-   \tag_mc_end: \int_gdecr:N \g__tbl_row_int 
+   \UseTaggingSocket{tbl/leaders/end}
+   \tbl_gdecr_row_count:
    \cr}
 
   \def\@cmidruleb{%
     \multispan\@cmidlb
     \unskip\hskip \cmrkern@l%
    {
-    \tag_mc_begin:n{artifact}
+    \UseTaggingSocket{tbl/leaders/begin}
     \CT@arc@\leaders\hrule \@height\@thisrulewidth\hfill\kern\z@}
     \hskip\cmrkern@r
-    \tag_mc_end: \int_gdecr:N \g__tbl_row_int 
+    \UseTaggingSocket{tbl/leaders/end}
+    \tbl_gdecr_row_count:
     \cr} 
   }
 \ExplSyntaxOff   
 %    \end{macrocode}
-
+%
 %
 % \subsection{fancyvrb}
 % The firstaid adds first partial tagging support to the environments 
@@ -432,13 +430,12 @@
 % is overwritten by the block code).
 % The environments are surrounded by a \texttt{verbatim} structure, 
 % every line by a \texttt{codeline} 
-% structure (this requires the block code, but firstaid should be used only with
-% phase-III anyway). Line numbers are tagged as Lbl, inside of the 
+% structure. Line numbers are tagged as \texttt{Lbl}, inside of the 
 % \texttt{codeline} structure. The frame lines are marked as artifact. 
 % 
 % \begin{macro}[no-user-doc]{\FV@LeaveVMode}
 % If we are in vmode we have to open a text-unit structure, if we are 
-% in hmode we have to set para mode to flattened before the fancyhdr code
+% in hmode we have to set para mode to flattened before the fancyvrb code
 % issues the\cs{par}. The closing of the text-unit structure is handled by the
 % doendpe code in the block code.
 %    \begin{macrocode}
@@ -453,10 +450,9 @@
       \fi
       \ifvmode
         \@noparlisttrue
-        \__tag_gincr_para_main_begin_int:
-        \tag_struct_begin:n{tag=\l__tag_para_main_tag_tl}    
+        \UseTaggingSocket{para/semantic/begin}{}
       \else
-        \bool_set_true:N\l__tag_para_flattened_bool
+        \tagpdfsetup{para/flattened=true}
         \@noparlistfalse
         \unskip\par
       \fi    
@@ -484,11 +480,9 @@
       \FV@ObeyTabsInit
       \cs_if_exist:NT \FV@BeginListFrame
         {
-         \tag_mc_begin:n{artifact}
-         \FV@BeginListFrame
-         \tag_mc_end:
+         \UseTaggingSocket{mc}{artifact}{\FV@BeginListFrame}         
         } 
-      \tag_struct_begin:n{tag=verbatim}     
+      \UseTaggingSocket{struct-begin}{tag=\UseStructureName{block/verbatim}}     
       }
 %    \end{macrocode}
 % \end{macro}
@@ -498,12 +492,10 @@
 %    \begin{macrocode}
     \def\FV@EndList{%
       \FV@ListProcessLastLine
-      \tag_struct_end:
+      \UseTaggingSocket{struct-end}
       \cs_if_exist:NT \FV@EndListFrame
         {
-         \tag_mc_begin:n{artifact}
-         \FV@EndListFrame
-         \tag_mc_end:
+         \UseTaggingSocket{mc}{artifact}{\FV@EndListFrame}         
         } 
       \@endparenv    
       \endgroup  
@@ -520,97 +512,96 @@
       \hbox to \hsize{%
         \kern\leftmargin
         \hbox to \linewidth{%
-         \tag_struct_begin:n{tag=codeline}
+         \UseTaggingSocket{struct-begin}{tag=\UseStructureName{block/verbatim/codeline}}
           \cs_if_exist:NT \FV@LeftListNumber
            {
-             \tag_struct_begin:n{tag=Lbl}
-             \tag_mc_begin:n{} 
-             \FV@LeftListNumber
-             \tag_mc_end:
-             \tag_struct_end:
+             \UseTaggingSocket{struct-mc}{tag=\UseStructureName{block/verbatim/linenumber}}
+              {
+                \FV@LeftListNumber
+              }  
            }
           \cs_if_exist:NT \FV@LeftListFrame
            {
-             \tag_mc_begin:n{artifact}
-             \FV@LeftListFrame
-             \tag_mc_end:
+             \UseTaggingSocket{mc}{artifact}{\FV@LeftListFrame}
            }
-          \tag_mc_begin:n{}% 
-          \FancyVerbFormatLine{#1}%
-          \tag_mc_end:
-          \tag_struct_end:\hss
+          \UseTaggingSocket{mc}{}{\FancyVerbFormatLine{#1}}%          
+          \UseTaggingSocket{struct-end}\hss
           \cs_if_exist:NT \FV@RightListFrame
            {
-             \tag_mc_begin:n{artifact}
-             \FV@RightListFrame
-             \tag_mc_end:
+             \UseTaggingSocket{mc}{artifact}{\FV@RightListFrame}
            }
           \cs_if_exist:NT \FV@RightListNumber
            {
-             \tag_struct_begin:n{tag=Lbl}
-             \tag_mc_begin:n{} 
-             \FV@RightListNumber
-             \tag_mc_begin:n{}
-             \tag_struct_end:
+             \UseTaggingSocket{struct-mc}{tag=\UseStructureName{block/verbatim/linenumber}}
+               {
+                 \FV@RightListNumber
+               }  
            }      
           }
           \hss}}
   }          
 \ExplSyntaxOff  
 %    \end{macrocode}
-%
-% \subsection{The \pkg{microtype} package first aid}
-% 
-% The microtype package fails in kernel 2025/11 if tagging is active as due to the
-% change to \cs{partokencontext} para tagging is triggered and then is unbalanced in 
-% an unwanted place. We disable the tagging in this command.
-% \changes{v0.85o}{2025/11/03}{Fix microtype to work with tagging 2025/11 kernel 
-% https://github.com/schlcht/microtype/issues/59}
-%    \begin{macrocode}
-\AddToHook{package/microtype/after}[firstaid]{%
-  \FirstAidNeededT{microtype}{sty}{2025/07/09 v3.2b
-   Micro-typographical refinements
-   (RS)}
-  {%
-    \def\MT@get@prot#1#2{%
-      \begingroup
-        \SuspendTagging{\MT@get@prot}%%added by firstaid
-        \setbox\MT@tempbox\vbox{%
-          \everypar{}%
-          \parfillskip=\z@skip
-          \hbadness\@M
-          \clubpenalty\z@
-          \widowpenalty\z@
-          \interlinepenalty\z@
-          \@newlistfalse
-          \MT@prot@hook
-          \begingroup
-            \MT@noindent #1\relax\MT@csq@eqgroup
-          \endgroup}%
-        \vbadness=\@M
-        \splittopskip=\z@
-        \vfuzz=\maxdimen
-        \setbox\MT@tempbox\vbox{%
-          \ifvbox\MT@tempbox
-            \global\setbox\MT@tempbox=\vsplit\MT@tempbox to \normalbaselineskip
-            \unvbox\MT@tempbox
-            \global\setbox\MT@tempbox=\lastbox
-          \fi
-        }%
-      \endgroup
-      \ifhbox\MT@tempbox
-        \@tempdima=\@nameuse{#2marginkern}\MT@tempbox\relax
-        \expandafter\ifdim\@tempdima=\z@ \else
-          \leavevmode
-          \MT@vinfo{|<< adding #2 margin kern for `#1':\MessageBreak
-            \the\@tempdima \on@line}%
-          \kern\@tempdima
-        \fi
-      \fi
-    }}
- }
-%    \end{macrocode}
 % \end{macro}
+% 
+% \subsection{The \pkg{float} package first aid}
+% 
+% The float package has a number of incompatibilites: 
+% \begin{itemize}
+% \item Restyling floats with \cs{restylefloat} breaks the tagging tagging support.
+% \item New float types created with \cs{newfloat} are not properly tagged (tagging issue 890)
+% \item Non-floating floats using the \texttt{H} placement are not properly tagged.
+% \end{itemize}
+% The following firstaid addresses the last problem. 
+% 
+%    \begin{macrocode}
+\ExplSyntaxOn
+\AddToHook{package/float/after}[firstaid]
+ {
+   \@@_firstaid_float_patch_H:
+ }
+\cs_new_protected:Npn \@@_firstaid_float_patch_H:
+ {  
+   \NewTaggingSocket{float/H/begin}{1}
+   \NewTaggingSocketPlug{float/H/begin}{default}
+    {
+      \mode_if_horizontal:T {\tag_mc_end_push: \tag_struct_end:}
+      \tag_struct_begin:n {tag=\UseStructureName{float/##1}}
+    }
+   \AssignTaggingSocketPlug{float/H/begin}{default}
+
+   \NewTaggingSocket{float/H/end}{0}
+   \NewTaggingSocketPlug{float/H/end}{default}
+    {
+       \tag_struct_end:
+       \mode_if_horizontal:T
+        {
+          \tag_struct_begin:n {tag=\UseStructureName{para/textblock}}
+          \tag_mc_begin_pop:n {}
+        }
+    }
+   \AssignTaggingSocketPlug{float/H/end}{default}
+%    \end{macrocode}
+% and here the redefinitions of the commands of \pkg{float}
+%    \begin{macrocode}
+   \def\@float@HH##1[H]{\UseTaggingSocket{float/H/begin}{##1}%
+     \expandafter\let\csname end##1\endcsname\float@endH
+     \let\@currbox\float@box
+     \def\@captype{##1}\setbox\@floatcapt=\vbox{}%
+     \expandafter\ifx\csname fst@##1\endcsname\relax
+     \@flstylefalse\else\@flstyletrue\fi
+     \setbox\@currbox\color@vbox\normalcolor
+       \vbox\bgroup \hsize\columnwidth \@parboxrestore
+        \@floatboxreset \@setnobreak
+     \ignorespaces}
+   \renewcommand\float@endH{\@endfloatbox\UseTaggingSocket{float/H/end}
+     \vskip\intextsep
+     \if@flstyle\setbox\@currbox\float@makebox\columnwidth\fi
+     \box\@currbox\vskip\intextsep\relax}  
+ }
+\ExplSyntaxOff 
+%    \end{macrocode}
+%
 %    \begin{macrocode}
 %</package>
 %    \end{macrocode}

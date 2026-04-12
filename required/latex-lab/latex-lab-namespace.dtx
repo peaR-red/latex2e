@@ -12,8 +12,8 @@
 %    https://www.latex-project.org/lppl.txt
 %
 %<*package>
-\def\ltlabnamesdate{2026-01-16}
-\def\ltlabnamesversion{0.8h}
+\def\ltlabnamesdate{2026-03-01}
+\def\ltlabnamesversion{0.8j}
 %</package>
 %<*driver>
 \DocumentMetadata{tagging=on,pdfstandard=ua-2}
@@ -305,16 +305,16 @@ tables,       Sect,     pdf2,
 %
 % \subsubsection{Table of contents and similar} 
 %    \begin{macrocode}
-%\NewStructureName{toc}
-%\AssignStructureRole{toc}{TOC}
-%\NewStructureName{toc/item}
-%\AssignStructureRole{toc/item}{TOCI}
-%\NewStructureName{toc/item/label}
-%\AssignStructureRole{toc/item/label}{Lbl}
-%\NewStructureName{toc/item/text}
-%\AssignStructureRole{toc/item/text}{Reference}
-%\NewStructureName{toc/item/page}
-%\AssignStructureRole{toc/item/page}{Reference}
+\NewStructureName{toc}
+\AssignStructureRole{toc}{TOC}
+\NewStructureName{toc/item}
+\AssignStructureRole{toc/item}{TOCI}
+\NewStructureName{toc/item/label}
+\AssignStructureRole{toc/item/label}{Lbl}
+\NewStructureName{toc/item/text}
+\AssignStructureRole{toc/item/text}{Reference}
+\NewStructureName{toc/item/page}
+\AssignStructureRole{toc/item/page}{Reference}
 %    \end{macrocode}
 %
 % \subsubsection{Title}
@@ -322,8 +322,8 @@ tables,       Sect,     pdf2,
 %    \begin{macrocode}
 %\NewStructureName{title/env}
 %\AssignStructureRole{title/env}{Part}  % e.g. around a titlepage 
-%\NewStructureName{title/text}
-%\AssignStructureRole{title/text}{Title} 
+\NewStructureName{title}
+\AssignStructureRole{title}{Title} 
 %    \end{macrocode}
 %
 % \subsubsection{Lists and blocks}
@@ -367,8 +367,8 @@ tables,       Sect,     pdf2,
 \AssignStructureRole{block/verbatim}{verbatim}
 \NewStructureName{block/verbatim/codeline}
 \AssignStructureRole{block/verbatim/codeline}{codeline}
-%\NewStructureName{block/verbatim/linenumber}
-%\AssignStructureRole{block/verbatim/linenumber}{Lbl}
+\NewStructureName{block/verbatim/linenumber}
+\AssignStructureRole{block/verbatim/linenumber}{Lbl}
 %
 \NewStructureName{block/theorem-like}
 \AssignStructureRole{block/theorem-like}{theorem-like}
@@ -384,7 +384,6 @@ tables,       Sect,     pdf2,
 %    \end{macrocode}
 %    
 %    \begin{macrocode}
-%
 %\NewStructureName{block/bib}
 %\AssignStructureRole{block/bib}{L}
 %\NewStructureName{block/bib/label}
@@ -398,27 +397,25 @@ tables,       Sect,     pdf2,
 %\subsubsection{References and Links}
 % 
 %    \begin{macrocode}
-%\NewStructureName{ref}
-%\AssignStructureRole{ref}{Reference}
-%\NewStructureName{link}
-%\AssignStructureRole{link}{Link}
-%\NewStructureName{ref/cite}
-%\AssignStructureRole{ref/cite}{Reference}
+\NewStructureName{ref}
+\AssignStructureRole{ref}{Reference}
+\NewStructureName{link}
+\AssignStructureRole{link}{Link}
+\NewStructureName{cite}
+\AssignStructureRole{cite}{Reference}
 %    \end{macrocode}
 %
 % \subsubsection{Tables}
 % 
 %    \begin{macrocode}
-%\NewStructureName{tbl/table}
-%\AssignStructureRole{tbl/table}{Table}
-%\NewStructureName{tbl/table/row}
-%\AssignStructureRole{tbl/table/row}{TR}
-%\NewStructureName{tbl/table/cell}
-%\AssignStructureRole{tbl/table/cell}{TD}
-%\NewStructureName{tbl/table/pcell}
-%\AssignStructureRole{tbl/table/pcell}{TD}
-%\NewStructureName{tbl/table/hcell}
-%\AssignStructureRole{tbl/table/hcell}{TH}
+\NewStructureName{table}
+\AssignStructureRole{table}{Table}
+\NewStructureName{table/row}
+\AssignStructureRole{table/row}{TR}
+\NewStructureName{table/cell}
+\AssignStructureRole{table/cell}{TD}
+\NewStructureName{table/headercell}
+\AssignStructureRole{table/headercell}{TH}
 %    \end{macrocode}
 % THead and TFoot are currently not used but are perhaps needed later
 %    \begin{macrocode}
@@ -427,6 +424,25 @@ tables,       Sect,     pdf2,
 %\NewStructureName{tbl/table/foot}
 %\AssignStructureRole{tbl/table/foot}{}
 %    \end{macrocode}
+% Inside p-cells we have to set the para/semantic structure to Div as Part is not
+% allowed as child of TD and as we can not flatten the paragraphs.
+%    \begin{macrocode}
+\NewStructureName{table/para/semantic}
+\AssignStructureRole{table/para/semantic}{Div}
+%    \end{macrocode}
+% We need also names for layout tables
+%    \begin{macrocode}
+\NewStructureName{layouttable}
+\AssignStructureRole{layouttable}{Div}
+\NewStructureName{layouttable/row}
+\AssignStructureRole{layouttable/row}{NonStruct}
+\NewStructureName{layouttable/cell}
+\AssignStructureRole{layouttable/cell}{\UseStructureName{para/textblock}}
+\NewStructureName{layouttable/pcell}
+\AssignStructureRole{layouttable/pcell}{NonStruct}
+%    \end{macrocode}
+%
+% 
 %
 % \subsubsection{Floats}
 % 
@@ -449,7 +465,6 @@ tables,       Sect,     pdf2,
 \AssignStructureRole{float/figure/label}{Lbl}
 \NewStructureName{float/table/label}
 \AssignStructureRole{float/table/label}{Lbl}
-%</package>
 %    \end{macrocode}
 %
 % \subsubsection{Footnotes}
@@ -465,14 +480,17 @@ tables,       Sect,     pdf2,
 %
 % \subsubsection{Graphics}
 %    \begin{macrocode}
-%\NewStructureName{graphic}
-%\AssignStructureRole{graphic}{Figure}
+\NewStructureName{graphic}
+\AssignStructureRole{graphic}{Figure}
+\NewStructureName{graphic/symbol}
+\AssignStructureRole{graphic/symbol}{Span}
 %    \end{macrocode}
 %
 % \subsubsection{Marginnotes}
 %    \begin{macrocode}
-%\NewStructureName{marginnote}
-%\AssignStructureRole{marginnote}{Aside}
+\NewStructureName{marginnote}
+\AssignStructureRole{marginnote}{Aside}
+%</package>
 %    \end{macrocode}
 %
 % \subsubsection{Minipages and parboxes}
@@ -482,15 +500,15 @@ tables,       Sect,     pdf2,
 \AssignStructureRole{minipage}{Div}
 \NewStructureName{parbox}
 \AssignStructureRole{parbox}{Div}
-%</package>
 %    \end{macrocode}
 %
 % \subsubsection{Text}
 %    \begin{macrocode}
 %\NewStructureName{text/span}
 %\AssignStructureRole{text/span}{Span}
-%\NewStructureName{text/emph}
-%\AssignStructureRole{text/emph}{Em}
+\NewStructureName{text/emph}
+\AssignStructureRole{text/emph}{Em}
+%</package>
 %    \end{macrocode}
 %
 % \subsubsection{Math}
