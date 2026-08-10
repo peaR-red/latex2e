@@ -1,0 +1,16 @@
+\documentclass{minimal}
+
+\usepackage{amsmath}
+\input{test2e}
+
+\mathcode`\(="8000
+\begingroup
+\catcode`\(=\active
+\gdef({\typeout{Initialization success}}
+\endgroup
+
+\begin{document}
+
+\START
+$()$
+\END
