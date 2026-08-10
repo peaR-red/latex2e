@@ -85,7 +85,7 @@ Bug reports can be opened (category \texttt{#1}) at\\%
 %    \end{macrocode}
 %
 %    \begin{macrocode}
-\ProvidesPackage{amsmath}[2026-06-04 v2.18d AMS math features]
+\ProvidesPackage{amsmath}[2026-08-10 v2.18e AMS math features]
 %    \end{macrocode}
 %
 % \section{Catcode defenses}
@@ -1489,7 +1489,10 @@ Foreign command \@backslashchar#1;\MessageBreak
 %
 % \changes{v2.15}{2016/02/20}{Modify \cs{resetMathstrut@} for Unicode \TeX}
 % \changes{v2.15b}{2016/03/10}{Modify \cs{resetMathstrut@} for classic \TeX\ to preserve box 0}
-% Original code assuming |\mathcode| is kept for 8bit \TeX. Unicode \TeX{}
+% \changes{v2.18e}{2026/08/10}{Modify \cs{resetMathstrut@} to handle math-active ( (gh/2105)}
+% Original code assuming |\mathcode| is kept for 8bit \TeX. We add a test
+% to handle math-active ( since pdftex will raise an error if someone made
+% the ( symbol math-active while setting up math. Unicode \TeX{}
 % uses |\Umathcharnumdef| which works for xetex and luatex, which use
 % different forms for |\mathchardef|. (New luatex always reports
 % definitions using |\Umathchardef| syntax even if |\mathchardef| used.)
@@ -1504,13 +1507,20 @@ Foreign command \@backslashchar#1;\MessageBreak
 \def\resetMathstrut@{%
   \begingroup
   \setbox\z@\hbox{%
-    \mathchardef\@tempa\mathcode`\(\relax
+    \ifnum\mathcode`\(="8000
+      \count@\delcode`\(\relax
+      \divide\count@"1000 \relax
+      \advance\count@"4000 \relax
+      \mathchardef\@tempa\count@
+    \else
+      \mathchardef\@tempa\mathcode`\(\relax
+    \fi
     \def\@tempb##1"##2##3{\the\textfont"##3\char"}%
     \expandafter\@tempb\meaning\@tempa \relax
   }%
- \edef\@tempa{%
-     \ht\Mathstrutbox@\the\ht\z@\relax
-     \dp\Mathstrutbox@\the\dp\z@\relax}%
+  \edef\@tempa{%
+    \ht\Mathstrutbox@\the\ht\z@\relax
+    \dp\Mathstrutbox@\the\dp\z@\relax}%
   \expandafter\endgroup\@tempa
 }
 \else
