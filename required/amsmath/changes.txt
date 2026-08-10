@@ -9,6 +9,10 @@ All changes above are only part of the development branch for the next release.
 # 2026-06-01 Release
 #########################
 
+2026-08-10 peaR <pearatlatex@gmail.com>
+    * amsmath.dtx (subsection{Struts for math}):
+    Modify \resetMathstrut@ to handle math-active ( (gh/2105)
+
 2026-05-19 Joseph Wright <joseph.wright@latex-project.org>
 	* amsmath.dtx (subsection{Matrices}):
 	Add a % to suppress a stray space (gh/1988)
