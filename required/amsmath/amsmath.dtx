@@ -1530,11 +1530,7 @@ Foreign command \@backslashchar#1;\MessageBreak
 %    \begin{macrocode}
 \def\resetMathstrut@{%
   \begingroup
-  \ifnum\mathcode`\(="8000
-    \Umathcharnumdef\@tempa\Udelcode`(\relax
-  \else
-    \Umathcharnumdef\@tempa\Umathcodenum`(\relax
-  \fi
+  \Umathcharnumdef\@tempa\Umathcodenum`(\relax
   \def\@tempb##1"##2"##3"##4\relax{%
     \endgroup
     \ht\Mathstrutbox@=\fontcharht\textfont"##3 "##4\relax
