@@ -3,7 +3,11 @@
 \usepackage{amsmath}
 \input{test2e}
 
-\mathcode`\(="8000
+\ifx\Umathcodenum\undefined
+  \mathcode`\(="8000
+\else
+  \Umathcodenum`\(="8000
+\fi
 \begingroup
 \catcode`\(=\active
 \gdef({\typeout{Initialization success}}
