@@ -1529,13 +1529,17 @@ Foreign command \@backslashchar#1;\MessageBreak
 % \changes{v2.15a}{2016/03/03}{missing percent added}
 %    \begin{macrocode}
 \def\resetMathstrut@{%
-    \begingroup
-    \Umathcharnumdef\@tempa\Umathcodenum`\(\relax
-    \def\@tempb##1"##2"##3"##4\relax{%
-      \endgroup
-      \ht\Mathstrutbox@=\fontcharht\textfont"##3 "##4\relax
-      \dp\Mathstrutbox@=\fontchardp\textfont"##3 "##4\relax}%
-    \expandafter\@tempb\meaning\@tempa \relax
+  \begingroup
+  \ifnum\mathcode`\(="8000
+    \Umathcharnumdef\@tempa\Udelcode`(\relax
+  \else
+    \Umathcharnumdef\@tempa\Umathcodenum`(\relax
+  \fi
+  \def\@tempb##1"##2"##3"##4\relax{%
+    \endgroup
+    \ht\Mathstrutbox@=\fontcharht\textfont"##3 "##4\relax
+    \dp\Mathstrutbox@=\fontchardp\textfont"##3 "##4\relax}%
+  \expandafter\@tempb\meaning\@tempa \relax
 }
 %    \end{macrocode}
 %    \begin{macrocode}
